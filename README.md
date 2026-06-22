@@ -107,41 +107,41 @@ Most candidates go into interviews underprepared — they don't know what questi
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    FRONTEND (React + Vite)               │
+│                    FRONTEND (React + Vite)              |
 │                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐ │
-│  │  Auth    │  │  Home    │  │Interview │  │  Mock  │ │
-│  │  Pages   │  │  Page    │  │  Report  │  │  Mode  │ │
-│  └──────────┘  └──────────┘  └──────────┘  └────────┘ │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐   |
+│  │  Auth    │  │  Home    │  │Interview │  │  Mock  │   |
+│  │  Pages   │  │  Page    │  │  Report  │  │  Mode  │   |
+│  └──────────┘  └──────────┘  └──────────┘  └────────┘   |
 │                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │           Axios (withCredentials: true)          │  │
-│  └──────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐   |
+│  │           Axios (withCredentials: true)          │   |
+│  └──────────────────────────────────────────────────┘   |
 └─────────────────────────────────────────────────────────┘
                             │
                             │ HTTP + Cookie Auth
                             │
 ┌─────────────────────────────────────────────────────────┐
-│                   BACKEND (Node.js + Express)            │
+│                   BACKEND (Node.js + Express)           │
 │                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐             │
-│  │  Auth    │  │Interview │  │  File    │             │
-│  │  Routes  │  │  Routes  │  │Middleware│             │
-│  └──────────┘  └──────────┘  └──────────┘             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
+│  │  Auth    │  │Interview │  │  File    │               │
+│  │  Routes  │  │  Routes  │  │Middleware│               │
+│  └──────────┘  └──────────┘  └──────────┘               │
 │                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │                  AI Service                      │  │
-│  │  generateInterviewReport() → Zod Schema          │  │
-│  │  evaluateAnswer()          → Zod Schema          │  │
-│  │  generateResumePdf()       → HTML → Puppeteer    │  │
-│  └──────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │                  AI Service                      │   │
+│  │  generateInterviewReport() → Zod Schema          │   │
+│  │  evaluateAnswer()          → Zod Schema          │   │
+│  │  generateResumePdf()       → HTML → Puppeteer    │   │
+│  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
                             │
                 ┌───────────┴───────────┐
                 │                       │
 ┌───────────────┐           ┌───────────────────┐
-│   MongoDB     │           │  Google Gemini API │
-│  (Database)   │           │  (AI Processing)   │
+│   MongoDB     │           │  Google Gemini API│
+│  (Database)   │           │  (AI Processing)  │
 └───────────────┘           └───────────────────┘
 ```
 
@@ -150,7 +150,7 @@ Most candidates go into interviews underprepared — they don't know what questi
 ## 📁 Project Structure
 
 ```
-interview-ai/
+CrackIt/
 ├── Backend/
 │   ├── src/
 │   │   ├── config/
@@ -203,8 +203,8 @@ interview-ai/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/interview-ai.git
-cd interview-ai
+git clone https://github.com/yourusername/CrackIt.git
+cd CrackIt
 ```
 
 ### 2. Setup Backend
@@ -246,18 +246,18 @@ http://localhost:5173
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-| POST | `/api/auth/logout` | Logout user |
-| GET | `/api/auth/get-me` | Get current user |
+| POST | `/api/auth/login`    | Login user        |
+| POST | `/api/auth/logout`   | Logout user       |
+| GET  | `/api/auth/get-me`   | Get current user  |
 
 ### Interview
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/interview/` | Generate interview report (with resume PDF upload) |
-| GET | `/api/interview/` | Get all reports for logged in user |
-| GET | `/api/interview/report/:id` | Get specific report by ID |
-| POST | `/api/interview/resume/pdf/:id` | Generate tailored resume PDF |
-| POST | `/api/interview/mock/evaluate` | Evaluate mock interview answer |
+| Method |           Endpoint             |              Description                              
+|--------|--------------------------------|-------------------------------------------------
+| POST   | `/api/interview/`              | Generate interview report (with resume PDF upload) 
+| GET    | `/api/interview/`              | Get all reports for logged in user 
+| GET    | `/api/interview/report/:id`    | Get specific report by ID 
+| POST   | `/api/interview/resume/pdf/:id`| Generate tailored resume PDF 
+| POST   | `/api/interview/mock/evaluate` | Evaluate mock interview answer 
 
 ---
 
@@ -339,7 +339,7 @@ See your match score, ATS score, present and missing keywords, skill gaps.
 
 ### Mock Interview Mode — Practice with Timer
 Answer questions with a 2-minute countdown timer. Get AI feedback after each answer.
-![Mock Interview](./screenshots/mock.png)
+![Mock Interview](./screenshots/Mock.png)
 
 ### Preparation Roadmap — Day-by-Day Plan
 AI generates a personalized day-wise preparation plan showing exactly what to study each day, which resources to use, and what to focus on to maximize your chances.
@@ -347,7 +347,7 @@ AI generates a personalized day-wise preparation plan showing exactly what to st
 
 ### Dashboard — See All Stats
 See all stats and compare your performance across interviews.
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./screenshots/Dashboard.png)
 
 ---
 
