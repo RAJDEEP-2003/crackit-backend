@@ -1,13 +1,13 @@
 const { GoogleGenAI } = require("@google/genai")
 const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
-const puppeteer = require("puppeteer")
+const puppeteer = require("puppeteer-core")
+const chromium = require("@sparticuz/chromium")
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
 
-// Retries on Gemini 503 "high demand" errors with exponential backoff
 async function generateContentWithRetry(params, maxRetries = 3, baseDelayMs = 2000) {
     let lastError
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -22,7 +22,7 @@ async function generateContentWithRetry(params, maxRetries = 3, baseDelayMs = 20
 
             if (!isRetryable || attempt === maxRetries) throw err
 
-            const delay = baseDelayMs * Math.pow(2, attempt) // 2s → 4s → 8s
+            const delay = baseDelayMs * Math.pow(2, attempt)
             console.log(`Gemini attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
             await new Promise(resolve => setTimeout(resolve, delay))
         }
@@ -83,9 +83,10 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 async function generatePdfFromHtml(htmlContent) {
     const browser = await puppeteer.launch({
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
     })
     const page = await browser.newPage()
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
