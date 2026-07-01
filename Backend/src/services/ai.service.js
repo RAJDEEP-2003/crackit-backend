@@ -7,6 +7,28 @@ const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
 
+// Retries on Gemini 503 "high demand" errors with exponential backoff
+async function generateContentWithRetry(params, maxRetries = 3, baseDelayMs = 2000) {
+    let lastError
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            return await ai.models.generateContent(params)
+        } catch (err) {
+            lastError = err
+            const message = err?.message || ""
+            const isRetryable = message.includes("503") || 
+                                message.includes("UNAVAILABLE") || 
+                                message.includes("high demand")
+
+            if (!isRetryable || attempt === maxRetries) throw err
+
+            const delay = baseDelayMs * Math.pow(2, attempt) // 2s → 4s → 8s
+            console.log(`Gemini attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+            await new Promise(resolve => setTimeout(resolve, delay))
+        }
+    }
+    throw lastError
+}
 
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
@@ -25,7 +47,7 @@ const interviewReportSchema = z.object({
     })).describe("Behavioral questions that can be asked in the interview along with their intention and how to answer them"),
     skillGaps: z.array(z.object({
         skill: z.string().describe("The skill which the candidate is lacking"),
-        severity: z.enum([ "low", "medium", "high" ]).describe("The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances")
+        severity: z.enum(["low", "medium", "high"]).describe("The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances")
     })).describe("List of skill gaps in the candidate's profile along with their severity"),
     preparationPlan: z.array(z.object({
         day: z.number().describe("The day number in the preparation plan, starting from 1"),
@@ -36,9 +58,7 @@ const interviewReportSchema = z.object({
 })
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
-
-
- const prompt = `Generate an interview report for a candidate with the following details:
+    const prompt = `Generate an interview report for a candidate with the following details:
     Resume: ${resume}
     Self Description: ${selfDescription}
     Job Description: ${jobDescription}
@@ -49,8 +69,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
     3. presentKeywords: List of important keywords from job description that ARE in the resume
     4. missingKeywords: List of important keywords from job description that are NOT in the resume
 `
-
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
         model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: {
@@ -60,11 +79,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
     })
 
     return JSON.parse(response.text)
-
-
 }
-
-
 
 async function generatePdfFromHtml(htmlContent) {
     const browser = await puppeteer.launch({
@@ -90,7 +105,6 @@ async function generatePdfFromHtml(htmlContent) {
 }
 
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
-
     const resumePdfSchema = z.object({
         html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
     })
@@ -130,17 +144,16 @@ HTML STRUCTURE TO FOLLOW:
 
 CONTENT RULES:
 - Tailor every bullet point to match keywords from the job description
-- Quantify achievements wherever possible (e.g. "Reduced load time by 40%")
+- Quantify achievements wherever possible
 - Use action verbs: Developed, Designed, Led, Implemented, Optimized
 - Include relevant technical keywords from the job description in the Skills section
 - Do NOT fabricate experience or credentials not present in the original resume
 - Write in a natural human tone, not AI-sounding
 
 Return ONLY a JSON object: {"html": "<your complete HTML here>"}`
-                    
 
-    const response = await ai.models.generateContent({
-        model:  "gemini-2.5-flash-lite",
+    const response = await generateContentWithRetry({
+        model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -148,13 +161,9 @@ Return ONLY a JSON object: {"html": "<your complete HTML here>"}`
         }
     })
 
-
     const jsonContent = JSON.parse(response.text)
-
     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
-
     return pdfBuffer
-
 }
 
 async function evaluateAnswer({ question, userAnswer, jobDescription }) {
@@ -174,7 +183,7 @@ Job Context: ${jobDescription}
 
 Score the answer from 1-10 and provide constructive feedback.`
 
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRetry({
         model: "gemini-2.5-flash-lite",
         contents: prompt,
         config: {
