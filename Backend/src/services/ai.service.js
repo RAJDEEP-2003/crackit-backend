@@ -16,9 +16,11 @@ async function generateContentWithRetry(params, maxRetries = 3, baseDelayMs = 20
         } catch (err) {
             lastError = err
             const message = err?.message || ""
-            const isRetryable = message.includes("503") || 
-                                message.includes("UNAVAILABLE") || 
-                                message.includes("high demand")
+           const isRetryable = message.includes("503") || 
+                    message.includes("UNAVAILABLE") || 
+                    message.includes("high demand") ||
+                    message.includes("429") ||
+                    message.includes("RESOURCE_EXHAUSTED")
 
             if (!isRetryable || attempt === maxRetries) throw err
 
