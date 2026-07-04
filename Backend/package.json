@@ -1,3 +1,4 @@
+
 {
   "name": "yt-genai",
   "version": "1.0.0",
@@ -5,8 +6,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon server.js"
+    "dev": "npx nodemon server.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "keywords": [],
   "author": "",
@@ -26,5 +28,9 @@
     "puppeteer-core": "^22.0.0",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.25.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1"
   }
 }
