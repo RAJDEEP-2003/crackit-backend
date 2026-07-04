@@ -82,17 +82,20 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
     return JSON.parse(response.text)
 }
-
 async function generatePdfFromHtml(htmlContent) {
+    // Resolve the executable path FIRST
+    const execPath = process.env.PUPPETEER_EXECUTABLE_PATH 
+        || await chromium.executablePath();
+
     const browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH 
-    || chromium.executablePath,
+        executablePath: execPath,
         headless: chromium.headless,
     })
     const page = await browser.newPage()
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+
 
     const pdfBuffer = await page.pdf({
         format: "A4",
