@@ -88,7 +88,7 @@ async function generatePdfFromHtml(htmlContent) {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH 
-    || await chromium.executablePath(),
+    || chromium.executablePath,
         headless: chromium.headless,
     })
     const page = await browser.newPage()
